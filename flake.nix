@@ -32,7 +32,10 @@
       };
     in {
       devShells.default = pkgs.mkShell {
-        nativeBuildInputs = [pkgs.devkitNix.devkitARM];
+        nativeBuildInputs = [
+          pkgs.citra-nightly
+          pkgs.devkitNix.devkitARM
+        ];
 
         inherit (pkgs.devkitNix.devkitARM) shellHook;
       };
