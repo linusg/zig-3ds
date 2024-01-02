@@ -6,23 +6,31 @@ const flags = .{"-lctru"};
 const devkitpro = "/opt/devkitpro";
 
 pub fn build(b: *std.build.Builder) void {
-    const mode = b.standardReleaseOptions();
-
-    const obj = b.addObject("zig-3ds", "src/main.zig");
-    obj.setOutputDir("zig-out");
-    obj.linkLibC();
-    obj.setLibCFile(std.build.FileSource{ .path = "libc.txt" });
-    obj.addIncludeDir(devkitpro ++ "/libctru/include");
-    obj.addIncludeDir(devkitpro ++ "/portlibs/3ds/include");
-    obj.setTarget(.{
+    const target: std.zig.CrossTarget = .{
         .cpu_arch = .arm,
         .os_tag = .freestanding,
         .abi = .eabihf,
         .cpu_model = .{ .explicit = &std.Target.arm.cpu.mpcore },
-    });
-    obj.setBuildMode(mode);
+    };
+    const optimize = b.standardOptimizeOption(.{});
 
-    const extension = if (builtin.target.os.tag == .windows) ".exe" else "";
+    const extension = comptime builtin.target.exeFileExt();
+
+    const obj = b.addObject(.{
+        .name = "zig-3ds",
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    obj.linkLibC();
+    obj.setLibCFile(.{ .path = "libc.txt" });
+    obj.addIncludePath(.{ .path = devkitpro ++ "/libctru/include" });
+    obj.addIncludePath(.{ .path = devkitpro ++ "/portlibs/3ds/include" });
+
+    const obj_install = b.addInstallArtifact(obj, .{
+        .dest_dir = .{ .override = .prefix },
+    });
+
     const elf = b.addSystemCommand(&(.{
         devkitpro ++ "/devkitARM/bin/arm-none-eabi-gcc" ++ extension,
         "-g",
@@ -45,11 +53,10 @@ pub fn build(b: *std.build.Builder) void {
         "zig-out/zig-3ds.elf",
         "zig-out/zig-3ds.3dsx",
     });
-    dsx.stdout_action = .ignore;
 
     b.default_step.dependOn(&dsx.step);
     dsx.step.dependOn(&elf.step);
-    elf.step.dependOn(&obj.step);
+    elf.step.dependOn(&obj_install.step);
 
     const run_step = b.step("run", "Run in Citra");
     const citra = b.addSystemCommand(&.{ emulator, "zig-out/zig-3ds.3dsx" });
