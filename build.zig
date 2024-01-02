@@ -1,9 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-const emulator = "citra";
-const flags = .{"-lctru"};
-
 pub fn build(b: *std.build.Builder) void {
     const devkitpro = std.process.getEnvVarOwned(b.allocator, "DEVKITPRO") catch |err| switch (err) {
         error.EnvironmentVariableNotFound => @panic("Please set $DEVKITPRO"),
@@ -48,7 +45,7 @@ pub fn build(b: *std.build.Builder) void {
         "zig-out/zig-3ds.o",
         b.fmt("-L{s}", .{b.pathJoin(&.{ devkitpro, "libctru/lib" })}),
         b.fmt("-L{s}", .{b.pathJoin(&.{ devkitpro, "portlibs/3ds/lib" })}),
-    } ++ flags ++ .{
+        "-lctru",
         "-o",
         "zig-out/zig-3ds.elf",
     }));
@@ -63,7 +60,7 @@ pub fn build(b: *std.build.Builder) void {
     dsx.step.dependOn(&elf.step);
     elf.step.dependOn(&obj_install.step);
 
-    const citra = b.addSystemCommand(&.{ emulator, "zig-out/zig-3ds.3dsx" });
+    const citra = b.addSystemCommand(&.{ "citra", "zig-out/zig-3ds.3dsx" });
     citra.step.dependOn(b.default_step);
 
     const run_step = b.step("run", "Run in Citra");
