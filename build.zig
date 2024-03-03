@@ -1,19 +1,19 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-pub fn build(b: *std.build.Builder) void {
+pub fn build(b: *std.Build) void {
     const devkitpro = std.process.getEnvVarOwned(b.allocator, "DEVKITPRO") catch |err| switch (err) {
         error.EnvironmentVariableNotFound => @panic("Please set $DEVKITPRO"),
-        error.InvalidUtf8 => @panic("Invalid UTF-8"),
+        error.InvalidWtf8 => @panic("Invalid WTF-8"),
         error.OutOfMemory => @panic("OOM"),
     };
 
-    const target: std.zig.CrossTarget = .{
+    const target = b.resolveTargetQuery(.{
         .cpu_arch = .arm,
         .os_tag = .freestanding,
         .abi = .eabihf,
         .cpu_model = .{ .explicit = &std.Target.arm.cpu.mpcore },
-    };
+    });
     const optimize = b.standardOptimizeOption(.{});
 
     const extension = comptime builtin.target.exeFileExt();
