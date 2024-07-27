@@ -20,14 +20,14 @@ pub fn build(b: *std.Build) void {
 
     const obj = b.addObject(.{
         .name = "zig-3ds",
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
     obj.linkLibC();
-    obj.setLibCFile(.{ .path = "libc.txt" });
-    obj.addIncludePath(.{ .path = b.pathJoin(&.{ devkitpro, "libctru/include" }) });
-    obj.addIncludePath(.{ .path = b.pathJoin(&.{ devkitpro, "portlibs/3ds/include" }) });
+    obj.setLibCFile(b.path("libc.txt"));
+    obj.addIncludePath(.{ .cwd_relative = b.pathJoin(&.{ devkitpro, "libctru/include" }) });
+    obj.addIncludePath(.{ .cwd_relative = b.pathJoin(&.{ devkitpro, "portlibs/3ds/include" }) });
 
     const obj_install = b.addInstallArtifact(obj, .{
         .dest_dir = .{ .override = .prefix },
