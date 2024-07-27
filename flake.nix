@@ -33,8 +33,8 @@
     in {
       devShells.default = pkgs.mkShell {
         nativeBuildInputs = [
-          pkgs.citra-nightly
           pkgs.devkitNix.devkitARM
+          pkgs.lime3ds
         ];
 
         inherit (pkgs.devkitNix.devkitARM) shellHook;

@@ -11,7 +11,7 @@
 pacman -S 3ds-dev
 git clone https://github.com/zig-homebrew/zig-3ds
 cd zig-3ds/
-zig build # then run zig-out/zig-3ds.3dsx with citra
+zig build run
 ```
 
 ## Resources
