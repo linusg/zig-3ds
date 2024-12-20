@@ -62,7 +62,7 @@ pub fn build(b: *std.Build) void {
     dsx.step.dependOn(&elf.step);
     elf.step.dependOn(&obj_install.step);
 
-    const lime3ds = b.addSystemCommand(&.{ "lime3ds-cli", "zig-out/zig-3ds.3dsx" });
+    const lime3ds = b.addSystemCommand(&.{ "lime3ds", "zig-out/zig-3ds.3dsx" });
     lime3ds.step.dependOn(b.default_step);
 
     const run_step = b.step("run", "Run in Lime3DS");
