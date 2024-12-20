@@ -20,9 +20,11 @@ pub fn build(b: *std.Build) void {
 
     const obj = b.addObject(.{
         .name = "zig-3ds",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     obj.linkLibC();
     obj.setLibCFile(b.path("libc.txt"));
